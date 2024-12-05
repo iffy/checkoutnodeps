@@ -21,4 +21,5 @@ jobs:
               apt-get update -qqq
               apt-get install -y curl build-essential git
     steps:
+      - uses: iffy/checkoutnodeps
       - uses: ./
