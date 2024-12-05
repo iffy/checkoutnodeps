@@ -1,0 +1,41 @@
+name: 'Checkout Dep Free'
+description: 'Checkout Git repos without needing NodeJS'
+inputs:
+  token:
+    default: ${{ github.token }}
+runs:
+  using: "composite"
+  steps:
+    - name: "Checkout"
+      shell: bash
+      run: |
+        export GIT_TERMINAL_PROMPT=0
+        export GIT_ASKPASS=/bin/echo
+        git version
+        wd="$(pwd)"
+        
+        git config --global --add safe.directory "$wd" || :
+        git init
+        if ! [ -d .git/refs/remotes/origin ]; then
+          git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
+        fi
+        git config --local gc.auto 0
+        CONFIG_KEY="http.${GITHUB_SERVER_URL}/.extraheader"
+        BASIC_CRED="$(printf "x-access-token:${GITHUB_TOKEN}" | base64)"
+        CONFIG_VALUE="Authorization: basic ${BASIC_CRED}"
+        git config --local "$CONFIG_KEY" "$CONFIG_VALUE"
+        git config --local "credential.${GITHUB_SERVER_URL}.username" "$GITHUB_ACTOR"
+
+        if [[ "${GITHUB_REF}" == "refs/heads/"* ]]; then
+          branch="${GITHUB_REF#refs/heads/}"
+          remote_ref="refs/remotes/origin/${branch}"
+          git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${remote_ref}"
+          git checkout --force -B "${branch}" "${remote_ref}"
+        else
+          git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${GITHUB_REF}"
+          git checkout --force "${GITHUB_REF}"
+        fi
+        git config --global --add safe.directory "$wd" || :
+
+      env:
+        GITHUB_TOKEN: ${{ inputs.token }}
