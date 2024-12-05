@@ -1,3 +1,7 @@
+# v1.0.1 - 2024-12-05
+
+- **FIX:** Make debian apt install non-interactive
+
 # v1.0.0 - 2024-12-05
 
 - **FIX:** Use sudo to install git only if available
