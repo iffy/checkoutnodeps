@@ -11,5 +11,5 @@ jobs:
   default:
     runs-on: ubuntu-latest
     steps:
-      - uses: iffy/checkoutnodeps@v1
+      - uses: iffy/checkoutnodeps@v0.1.0
 ```
