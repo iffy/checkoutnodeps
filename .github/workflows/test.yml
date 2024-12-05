@@ -21,5 +21,8 @@ jobs:
               apt-get update -qqq
               apt-get install -y curl build-essential git
     steps:
+      - name: Extra setup
+        shell: bash
+        run: ${{ matrix.extrasetup }}
       - uses: iffy/checkoutnodeps@master
       - uses: ./
