@@ -11,7 +11,7 @@ runs:
       run: |
         # try to install git
         if ! which git; then
-          SUDO=$(which sudo)
+          SUDO="$(which sudo)"
           if which apt; then
             "$SUDO" apt-get update -qqq
             "$SUDO" apt install -y git-all
@@ -49,6 +49,8 @@ runs:
           git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${GITHUB_REF}"
           git checkout --force "${GITHUB_REF}"
         fi
+        git reset --hard
+        git clean -fdx
         git config --global --add safe.directory "$wd" || :
 
       env:
