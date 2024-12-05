@@ -9,7 +9,7 @@ runs:
     - name: "Checkout"
       shell: bash
       run: |
-        # try to install git
+        # try to install git if it's not available
         if ! which git; then
           maybesudo() {
             if which sudo; then
@@ -36,9 +36,7 @@ runs:
         
         git config --global --add safe.directory "$wd" || :
         git init
-        if ! [ -e .git/refs/remotes/origin ]; then
-          git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
-        fi
+        git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}" || echo "Failed adding origin"
         git config --local gc.auto 0
         CONFIG_KEY="http.${GITHUB_SERVER_URL}/.extraheader"
         BASIC_CRED="$(printf "x-access-token:${GITHUB_TOKEN}" | base64)"
