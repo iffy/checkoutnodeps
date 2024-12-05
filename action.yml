@@ -30,7 +30,7 @@ runs:
         
         git config --global --add safe.directory "$wd" || :
         git init
-        if ! [ -d .git/refs/remotes/origin ]; then
+        if ! [ -e .git/refs/remotes/origin ]; then
           git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
         fi
         git config --local gc.auto 0
