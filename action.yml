@@ -9,6 +9,20 @@ runs:
     - name: "Checkout"
       shell: bash
       run: |
+        # try to install git
+        if ! which git; then
+          SUDO=$(which sudo)
+          if which apt; then
+            "$SUDO" apt-get update -qqq
+            "$SUDO" apt install -y git-all
+          elif which dnf; then
+            "$SUDO" dnf install git-all
+          else
+            echo "Unable to install git"
+            exit 1
+          fi
+        fi
+
         export GIT_TERMINAL_PROMPT=0
         export GIT_ASKPASS=/bin/echo
         git version
