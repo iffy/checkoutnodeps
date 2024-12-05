@@ -9,6 +9,20 @@ runs:
     - name: "Checkout"
       shell: bash
       run: |
+        # try to install git
+        if ! which git; then
+          SUDO="$(which sudo)"
+          if which apt; then
+            "$SUDO" apt-get update -qqq
+            "$SUDO" apt install -y git-all
+          elif which dnf; then
+            "$SUDO" dnf install git-all
+          else
+            echo "Unable to install git"
+            exit 1
+          fi
+        fi
+
         export GIT_TERMINAL_PROMPT=0
         export GIT_ASKPASS=/bin/echo
         git version
@@ -16,7 +30,7 @@ runs:
         
         git config --global --add safe.directory "$wd" || :
         git init
-        if ! [ -d .git/refs/remotes/origin ]; then
+        if ! [ -e .git/refs/remotes/origin ]; then
           git remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}"
         fi
         git config --local gc.auto 0
@@ -35,6 +49,8 @@ runs:
           git fetch --no-tags --prune --no-recurse-submodules --depth=1 origin "+${GITHUB_SHA}:${GITHUB_REF}"
           git checkout --force "${GITHUB_REF}"
         fi
+        git reset --hard
+        git clean -fdx
         git config --global --add safe.directory "$wd" || :
 
       env:
